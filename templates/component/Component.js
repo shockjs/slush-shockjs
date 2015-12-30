@@ -15,4 +15,6 @@ class <%= name %> extends Component
 }
 <% if (redux) { %>
 export default connect(state => state.<%= name %>)(<%= name %>);
+<% } else { %>
+export default <%= name %>;
 <% } %>
