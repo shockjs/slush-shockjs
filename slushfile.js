@@ -1,26 +1,64 @@
-var gulp = require('gulp'),
-  install = require('gulp-install'),
-  conflict = require('gulp-conflict'),
-  template = require('gulp-template'),
-  inquirer = require('inquirer');
+'use strict';
 
-gulp.task('default', function (done) {
+const gulp = require('gulp');
+const install = require('gulp-install');
+const conflict = require('gulp-conflict');
+const template = require('gulp-template');
+const inquirer = require('inquirer');
+const rename = require('gulp-rename');
+
+gulp.task('default', (done) => {
   inquirer.prompt([
-      {type: 'input', name: 'name', message: 'Give your app a name', default: gulp.args.join(' ')}, // Get app name from arguments by default
+      {type: 'input', name: 'name', message: 'Give your app a name', default: gulp.args.join(' ')},
       {type: 'confirm', name: 'moveon', message: 'Continue?'}
     ],
-    function (answers) {
+    (answers) => {
       if (!answers.moveon) {
         return done();
       }
-      gulp.src(__dirname + '/templates/app/**')  // Note use of __dirname to be relative to generator
-        .pipe(template(answers))                 // Lodash template support
-        .pipe(conflict('./'))                    // Confirms overwrites on file conflicts
-        .pipe(gulp.dest('./'))                   // Without __dirname here = relative to cwd
-        .pipe(install())                         // Run `bower install` and/or `npm install` if necessary
+      gulp.src(__dirname + '/templates/app/**')
+        .pipe(template(answers))
+        .pipe(conflict('./'))
+        .pipe(gulp.dest('./'))
+        .pipe(install())
         .on('end', function () {
-          done();                                // Finished!
+          done();
         })
         .resume();
-    });
+    }
+  );
+});
+
+gulp.task('component', (done) => {
+  inquirer.prompt([
+      {type: 'input', name: 'name', message: 'Component name:', default: gulp.args.join(' ')},
+      {type: 'input', name: 'destination', message: 'Destination: ', default: './src/shared/components'},
+      {type: 'confirm', name: 'redux', message: 'Connect to redux: ', default: false},
+      {type: 'confirm', name: 'moveon', message: 'Continue?'}
+    ],
+    (answers) => {
+      if (!answers.moveon) {
+        return done();
+      }
+
+      var ComponentFile = new Promise((resolve, reject) => {
+        gulp.src(__dirname + '/templates/component/Component.js')
+          .pipe(template(answers))
+          .pipe(rename(answers.name + '.js'))
+          .pipe(conflict(answers.destination))
+          .pipe(gulp.dest(answers.destination))
+          .on('end', function () {
+            resolve();
+          })
+          .on('error', function () {
+            reject();
+          })
+      });
+
+      Promise.all(ComponentFile, () => {
+        done();
+      });
+
+    }
+  );
 });
