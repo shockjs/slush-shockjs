@@ -11,7 +11,7 @@ gulp.task('default', (done) => {
   inquirer.prompt([
       {type: 'input', name: 'name', message: 'Give your app a name', default: gulp.args.join(' ')},
       {type: 'confirm', name: 'moveon', message: 'Continue?'}
-    ],
+  ],
     (answers) => {
       if (!answers.moveon) {
         return done();
@@ -35,7 +35,7 @@ gulp.task('component', (done) => {
       {type: 'input', name: 'destination', message: 'Destination: ', default: './src/shared/components'},
       {type: 'confirm', name: 'redux', message: 'Connect to redux: ', default: false},
       {type: 'confirm', name: 'moveon', message: 'Continue?'}
-    ],
+  ],
     (answers) => {
       if (!answers.moveon) {
         return done();
@@ -52,7 +52,7 @@ gulp.task('component', (done) => {
           })
           .on('error', function () {
             reject();
-          })
+          });
       });
 
       Promise.all(ComponentFile, () => {
